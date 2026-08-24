@@ -1,4 +1,4 @@
-# LLM Systems / Inference Infrastructure Engineer
+# LLMシステム / 推論基盤エンジニア
 
 LLM推論システムを中心に、**性能計測・推論ランタイム・カーネル最適化・Serving Infrastructure・Edge Deployment**まで横断して取り組んでいます。\
 主な関心領域は、**vLLM / llama.cpp / Ollama を用いたLLM推論、KV Cache / Prefix Cache、Speculative Decoding、量子化、再現可能な性能計測**です。加えて、**CUDA / Tritonによるカーネル最適化**や、**Kubernetes / K3s、Helm、Gateway、Observability、障害復旧**まで含めた推論基盤の構築・運用にも取り組んでいます。\
@@ -6,7 +6,7 @@ LLM推論システムを中心に、**性能計測・推論ランタイム・カ
 
 **Kernel Optimization → Inference Runtime → Serving Infrastructure → Edge Deployment**
 
-## Focus Areas
+## 主な領域
 
 - LLM Inference: vLLM / llama.cpp / Ollama
 - KV Cache / Prefix Cache / Speculative Decoding
@@ -15,11 +15,11 @@ LLM推論システムを中心に、**性能計測・推論ランタイム・カ
 - Kubernetes / K3s / Helm / Observability
 - ARM64 / Edge AI
 
-## Selected Work
+## 主な取り組み
 
 vLLMのdecode処理をプロファイルし、mini decoder、Attention / KV Cache、GEMV、RMSNorm、elementwise fusionなどを段階的に検証しています。\
-CUDA / Tritonによるカーネル実装とend-to-end検証まで行い、実際のvLLM decode処理で**TPOTを約15%改善**するケースを確認しました。\
-**Result: ~15% lower TPOT in end-to-end vLLM decode**
+CUDA / Tritonによるカーネル実装とend-to-end検証まで行い、実際のvLLM decode処理で**TPOTを約15%短縮**するケースを確認しました。\
+**結果: end-to-endのvLLM decodeでTPOTを約15%短縮**
 
 GPU上のLLM推論について、tokens/secだけではなく、**Prefix Cache、RadixAttention、推論条件、キャッシュ再利用**などを含めた再現可能な性能計測環境を構築しています。\
 実験スクリプト、条件、測定結果を残し、性能改善だけでなく、**成立条件や制約まで検証可能な形にすること**を重視しています。
@@ -27,7 +27,7 @@ GPU上のLLM推論について、tokens/secだけではなく、**Prefix Cache�
 ARM64 / WSL2環境を小規模なオンプレミスAI基盤に見立て、LLM Serving Infrastructureを構築しています。\
 K3s、Helm、Gateway、OpenAI / Anthropic互換API、SSE、永続ストレージ、Tailscale、Androidクライアント、監視、upgrade / rollback、障害復旧訓練まで含め、**モデルを動かすだけでなく、継続的に運用できる推論基盤**を対象にしています。
 
-## Technical Writing / Research
+## 技術記事 / 研究
 
 LLM推論、GPU最適化、Edge AI、ローカルAIを中心に、実装・実験結果をQiitaでも公開しています。\
 **Qiita:** [@Marron-chan](https://qiita.com/Marron-chan)\
@@ -54,14 +54,11 @@ I am particularly interested in measuring where LLM inference systems actually s
 
 ## Selected Work
 
-I profile vLLM decode workloads and progressively evaluate mini decoder components, Attention / KV Cache, GEMV, RMSNorm, and elementwise fusion.
-
-I implement and evaluate CUDA / Triton kernels and validate their impact end-to-end, including a case where kernel-level optimization achieved an approximately **15% reduction in TPOT in real vLLM decode workloads**.
-
+I profile vLLM decode workloads and progressively evaluate mini decoder components, Attention / KV Cache, GEMV, RMSNorm, and elementwise fusion.\
+I implement and evaluate CUDA / Triton kernels and validate their impact end-to-end, including a case where kernel-level optimization achieved an approximately **15% reduction in TPOT in real vLLM decode workloads**.\
 **Result: ~15% lower TPOT in end-to-end vLLM decode**
 
-I build reproducible environments for evaluating LLM inference on GPUs, covering not only aggregate tokens/sec but also **Prefix Cache, RadixAttention, inference conditions, and cache reuse behavior**.
-
+I build reproducible environments for evaluating LLM inference on GPUs, covering not only aggregate tokens/sec but also **Prefix Cache, RadixAttention, inference conditions, and cache reuse behavior**.\
 I preserve experiment scripts, configurations, and measured results so that performance improvements, their **conditions, and their limitations remain reproducible and verifiable**.
 
 I use an ARM64 / WSL2 environment as a small-scale on-premises AI platform and build an LLM serving infrastructure around it.\
