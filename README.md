@@ -24,6 +24,34 @@ limitations.
   access, upgrade/rollback, and measured recovery drills
   ([repository](https://github.com/CHIPMUNK-T0T/edge-llm-cpu-arm64)).
 
+## Engineering strengths
+
+### 1. Cross-layer LLM systems work
+
+I can move between **GPU kernels, inference runtimes, serving APIs, and
+infrastructure**. This lets me trace an end-to-end latency problem to the layer
+that actually controls it instead of optimizing an isolated component.
+
+### 2. Measurement before claims
+
+I evaluate changes with **TTFT, TPOT/ITL, throughput, acceptance rate, memory
+usage, profiler traces, and recovery time**. Benchmark inputs, configurations,
+raw results, and limitations are kept together so another engineer can inspect
+the conclusion.
+
+### 3. Engineering under real constraints
+
+I work with constraints such as a **12 GB consumer GPU, CPU-only ARM64,
+Windows/WSL2, and single-node K3s**. I make the trade-offs explicit and design
+for the environment that exists rather than assuming unlimited hardware.
+
+### 4. From investigation to upstream contribution
+
+I turn observations into minimal reproductions, design proposals, tests,
+benchmarks, and reviewable changes. The merged llama.cpp contribution shows
+that I can respond to maintainer feedback and carry a systems change through
+upstream review.
+
 ## What I work on
 
 - LLM inference with **vLLM, llama.cpp, Ollama, and SGLang**
