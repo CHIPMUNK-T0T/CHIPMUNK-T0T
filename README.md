@@ -1,72 +1,81 @@
-# LLMシステム / 推論基盤エンジニア
+# LLM Inference & AI Infrastructure Engineer
 
-LLM推論システムを中心に、**性能計測・推論ランタイム・カーネル最適化・Serving Infrastructure・Edge Deployment**まで横断して取り組んでいます。\
-主な関心領域は、**vLLM / llama.cpp / Ollama を用いたLLM推論、KV Cache / Prefix Cache、Speculative Decoding、量子化、再現可能な性能計測**です。加えて、**CUDA / Tritonによるカーネル最適化**や、**Kubernetes / K3s、Helm、Gateway、Observability、障害復旧**まで含めた推論基盤の構築・運用にも取り組んでいます。\
-特に、LLM推論システムのどこで時間やリソースが使われているのかを実測し、ボトルネックを特定した上で、**Kernel Optimization / Runtime / Serving Infrastructure / Edge Deploymentをまたいで改善すること**に関心があります。
+I build and optimize LLM systems across **inference runtimes, CUDA/Triton
+kernels, Kubernetes serving, observability, and edge deployment**.
+
+My work is measurement-driven: identify the bottleneck, change the smallest
+useful layer, validate the effect end to end, and document the conditions and
+limitations.
 
 **Kernel Optimization → Inference Runtime → Serving Infrastructure → Edge Deployment**
 
-## 主な領域
+## Selected impact
 
-- LLM Inference: vLLM / llama.cpp / Ollama
-- KV Cache / Prefix Cache / Speculative Decoding
-- Quantization / Reproducible Benchmarking
-- CUDA / Triton Kernel Optimization
-- Kubernetes / K3s / Helm / Observability
-- ARM64 / Edge AI
+- **Merged into llama.cpp:** implemented slot save/restore for multimodal inputs
+  in [ggml-org/llama.cpp#26640](https://github.com/ggml-org/llama.cpp/pull/26640).
+  A bounded Qwen3.5-2B benchmark measured **13.4× faster prompt processing**
+  after restore.
+- **Real vLLM optimization:** profiled the decode path, implemented CUDA/Triton
+  kernels, and measured approximately **15% lower TPOT** in a bounded
+  end-to-end workload
+  ([repository](https://github.com/CHIPMUNK-T0T/cuda-kernel-engineering)).
+- **Operable ARM64 serving platform:** built a CPU-only LLM platform on Windows
+  on ARM, WSL2, and K3s with Helm, Envoy, Prometheus, Grafana, private client
+  access, upgrade/rollback, and measured recovery drills
+  ([repository](https://github.com/CHIPMUNK-T0T/edge-llm-cpu-arm64)).
 
-## 主な取り組み
+## What I work on
 
-vLLMのdecode処理をプロファイルし、mini decoder、Attention / KV Cache、GEMV、RMSNorm、elementwise fusionなどを段階的に検証しています。\
-CUDA / Tritonによるカーネル実装とend-to-end検証まで行い、実際のvLLM decode処理で**TPOTを約15%短縮**するケースを確認しました。\
-**結果: end-to-endのvLLM decodeでTPOTを約15%短縮**
+- LLM inference with **vLLM, llama.cpp, Ollama, and SGLang**
+- **KV Cache, Prefix Cache, speculative decoding, and quantization**
+- **CUDA C++ and Triton** kernel implementation and profiling
+- **Kubernetes, K3s, Helm, gateways, observability, and failure recovery**
+- Reproducible evaluation of **TTFT, TPOT/ITL, throughput, memory, and cache
+  behavior**
+- **ARM64 and edge AI** under real hardware and operating-system constraints
 
-GPU上のLLM推論について、tokens/secだけではなく、**Prefix Cache、RadixAttention、推論条件、キャッシュ再利用**などを含めた再現可能な性能計測環境を構築しています。\
-実験スクリプト、条件、測定結果を残し、性能改善だけでなく、**成立条件や制約まで検証可能な形にすること**を重視しています。
+## Selected projects
 
-ARM64 / WSL2環境を小規模なオンプレミスAI基盤に見立て、LLM Serving Infrastructureを構築しています。\
-K3s、Helm、Gateway、OpenAI / Anthropic互換API、SSE、永続ストレージ、Tailscale、Androidクライアント、監視、upgrade / rollback、障害復旧訓練まで含め、**モデルを動かすだけでなく、継続的に運用できる推論基盤**を対象にしています。
+| Project | Engineering focus | Evidence |
+| --- | --- | --- |
+| [CUDA Kernel Engineering for LLM Decode](https://github.com/CHIPMUNK-T0T/cuda-kernel-engineering) | PyTorch/Triton/CUDA C++, Nsight profiling, mini-decode to real vLLM | ~15% lower TPOT under documented conditions |
+| [Edge LLM Platform on ARM64](https://github.com/CHIPMUNK-T0T/edge-llm-cpu-arm64) | K3s, Helm, Envoy, Tailscale, Prometheus/Grafana, recovery | Deployment contracts and measured recovery evidence |
+| [Ollama Prefill KV Restore](https://github.com/ai-systems-notes/ollama-prefill-kv-restore) | Persistent prefix-cache reuse and TTFT measurement | Reproducible benchmark and upstream design work |
+| [Local LLM RAG vs CAG Benchmark](https://github.com/ai-systems-notes/local-llm-rag-cag-benchmark) | Accuracy, TTFT, and token-cost comparison | Same-model, same-hardware evaluation |
 
-## 技術記事 / 研究
+## Open-source work
 
-LLM推論、GPU最適化、Edge AI、ローカルAIを中心に、実装・実験結果をQiitaでも公開しています。\
-**Qiita:** [@Marron-chan](https://qiita.com/Marron-chan)\
-研究・技術検証では、ベンチマークスコアだけに依存せず、**レイテンシ、メモリ使用量、キャッシュ挙動、量子化誤差などの直接観測可能な指標**を用いた実証的な評価を重視しています。
+I contribute findings and implementations upstream instead of keeping every
+result in a standalone demo.
+
+- [llama.cpp #26640 — multimodal slot save/restore](https://github.com/ggml-org/llama.cpp/pull/26640)
+  — merged
+- [llama.cpp #27942 — byte-oriented per-sequence payload design](https://github.com/ggml-org/llama.cpp/issues/27942)
+- [Ollama #17247 — warm prefill cache across model unload/reload](https://github.com/ollama/ollama/issues/17247)
+
+## Technical writing
+
+I publish Japanese implementation notes and benchmark results on
+[Qiita (@Marron-chan)](https://qiita.com/Marron-chan).
+
+## Role interests
+
+I am interested in **LLM Inference Engineer, ML Systems Engineer, AI
+Infrastructure Engineer, GPU Performance Engineer, and Forward Deployed
+Engineer** roles where measured systems work matters.
 
 ---
 
-# LLM Systems / Inference Infrastructure Engineer
+## 日本語
 
-I work on LLM inference systems across **performance measurement, inference runtimes, kernel optimization, serving infrastructure, and edge deployment**.\
-My main areas of interest include **LLM inference with vLLM / llama.cpp / Ollama, KV Cache / Prefix Cache, speculative decoding, quantization, and reproducible performance evaluation**. I also work on **CUDA / Triton kernel optimization** and inference infrastructure spanning **Kubernetes / K3s, Helm, gateways, observability, and failure recovery**.\
-I am particularly interested in measuring where LLM inference systems actually spend time and resources, identifying bottlenecks, and improving systems across **Kernel Optimization / Runtime / Serving Infrastructure / Edge Deployment**.
+LLM推論を中心に、性能計測、推論ランタイム、CUDA/Tritonカーネル最適化、
+KubernetesによるServing Infrastructure、Observability、障害復旧、
+ARM64 Edge Deploymentまで横断して取り組んでいます。
 
-**Kernel Optimization → Inference Runtime → Serving Infrastructure → Edge Deployment**
+単にモデルを動かすのではなく、ボトルネックを実測し、改善を実装し、
+end-to-endで効果を検証し、成立条件と限界まで再現可能な形で残すことを
+重視しています。
 
-## Focus Areas
-
-- LLM Inference: vLLM / llama.cpp / Ollama
-- KV Cache / Prefix Cache / Speculative Decoding
-- Quantization / Reproducible Benchmarking
-- CUDA / Triton Kernel Optimization
-- Kubernetes / K3s / Helm / Observability
-- ARM64 / Edge AI
-
-## Selected Work
-
-I profile vLLM decode workloads and progressively evaluate mini decoder components, Attention / KV Cache, GEMV, RMSNorm, and elementwise fusion.\
-I implement and evaluate CUDA / Triton kernels and validate their impact end-to-end, including a case where kernel-level optimization achieved an approximately **15% reduction in TPOT in real vLLM decode workloads**.\
-**Result: ~15% lower TPOT in end-to-end vLLM decode**
-
-I build reproducible environments for evaluating LLM inference on GPUs, covering not only aggregate tokens/sec but also **Prefix Cache, RadixAttention, inference conditions, and cache reuse behavior**.\
-I preserve experiment scripts, configurations, and measured results so that performance improvements, their **conditions, and their limitations remain reproducible and verifiable**.
-
-I use an ARM64 / WSL2 environment as a small-scale on-premises AI platform and build an LLM serving infrastructure around it.\
-The project covers K3s, Helm, gateways, OpenAI / Anthropic-compatible APIs, SSE, persistent storage, Tailscale, Android clients, observability, upgrade / rollback procedures, and recovery drills.\
-The goal is not only to run a model, but to build an inference platform that can be **operated, observed, upgraded, and recovered reliably**.
-
-## Technical Writing / Research
-
-I publish implementation notes and experimental results on LLM inference, GPU optimization, Edge AI, and local AI on Qiita.\
-**Qiita:** [@Marron-chan](https://qiita.com/Marron-chan)\
-In research and technical experiments, I focus on empirical evaluation using **directly observable metrics** such as latency, memory usage, cache behavior, and quantization error rather than relying only on aggregate benchmark scores.
+主な成果は、llama.cppへのマルチモーダルslot save/restore実装のマージ、
+限定条件下での実vLLM decode TPOT約15%短縮、Windows ARM64・WSL2・K3s上の
+CPU-only LLM serving基盤と復旧実測です。
