@@ -7,6 +7,9 @@ CUDA/Tritonカーネル、推論ランタイム、Kubernetes Serving、可観測
 LLM推論システムを層をまたいで扱っています。AIアプリの機能開発よりも、
 **推論性能・実行基盤・運用性を成立させる仕事**が専門です。
 
+顧客・on-premises環境を想定した制約を技術要件へ落とし込み、
+**deployment、troubleshooting、observability、recovery**まで再現可能な形で検証します。
+
 ## 代表的な成果
 
 | 成果 | 実装・検証したこと | 証拠 |
@@ -90,11 +93,13 @@ Infrastructure, and Forward Deployed Engineering** roles.
 **Infrastructure:** Kubernetes, K3s, Helm, Envoy Gateway, Prometheus, Grafana, Tailscale  
 **Platforms:** NVIDIA consumer GPUs, Windows on ARM, WSL2 Ubuntu ARM64, CPU-only edge
 
-## Open-source work
+## OSSでの実装 / Open-source delivery
 
-- [llama.cpp #26640 — multimodal slot save/restore](https://github.com/ggml-org/llama.cpp/pull/26640) — **merged**
-- [llama.cpp #27942 — byte-oriented per-sequence payload design](https://github.com/ggml-org/llama.cpp/issues/27942)
-- [Ollama #17247 — warm prefill cache across model unload/reload](https://github.com/ollama/ollama/issues/17247)
+- **Merged / マージ済み:** [llama.cpp #26640 — multimodal slot save/restore](https://github.com/ggml-org/llama.cpp/pull/26640)
+- **Under review / レビュー中:** [vLLM #55907 — prevent cache reuse across KV-cache layouts](https://github.com/vllm-project/vllm/pull/55907)
+- **Under review / レビュー中:** [Ollama #17953 — prefill cache persistence across runner reloads](https://github.com/ollama/ollama/pull/17953)
+
+レビュー中のPRはマージ済み実績とは分けて表示しています。
 
 ## 技術記事 / Technical writing
 
