@@ -1,109 +1,102 @@
-# LLM Inference & AI Infrastructure Engineer
+# LLM Inference Engineer | GPU Performance × Runtime × Serving Infrastructure
 
-I build and optimize LLM systems across **inference runtimes, CUDA/Triton
-kernels, Kubernetes serving, observability, and edge deployment**.
+> **「モデルを動かす」で終わらせず、遅い理由を特定し、実装し、実環境で効果を測る。**  
+> I find where LLM inference time is actually spent, implement the improvement, and validate it end to end.
 
-My work is measurement-driven: identify the bottleneck, change the smallest
-useful layer, validate the effect end to end, and document the conditions and
-limitations.
+CUDA/Tritonカーネル、推論ランタイム、Kubernetes Serving、可観測性、障害復旧まで、
+LLM推論システムを層をまたいで扱っています。AIアプリの機能開発よりも、
+**推論性能・実行基盤・運用性を成立させる仕事**が専門です。
 
-**Kernel Optimization → Inference Runtime → Serving Infrastructure → Edge Deployment**
+## 代表的な成果
 
-## Selected impact
-
-- **Merged into llama.cpp:** implemented slot save/restore for multimodal inputs
-  in [ggml-org/llama.cpp#26640](https://github.com/ggml-org/llama.cpp/pull/26640).
-  A bounded Qwen3.5-2B benchmark measured **13.4× faster prompt processing**
-  after restore.
-- **Real vLLM optimization:** profiled the decode path, implemented CUDA/Triton
-  kernels, and measured approximately **15% lower TPOT** in a bounded
-  end-to-end workload
-  ([repository](https://github.com/CHIPMUNK-T0T/cuda-kernel-engineering)).
-- **Operable ARM64 serving platform:** built a CPU-only LLM platform on Windows
-  on ARM, WSL2, and K3s with Helm, Envoy, Prometheus, Grafana, private client
-  access, upgrade/rollback, and measured recovery drills
-  ([repository](https://github.com/CHIPMUNK-T0T/edge-llm-cpu-arm64)).
-
-## Engineering strengths
-
-### 1. Cross-layer LLM systems work
-
-I can move between **GPU kernels, inference runtimes, serving APIs, and
-infrastructure**. This lets me trace an end-to-end latency problem to the layer
-that actually controls it instead of optimizing an isolated component.
-
-### 2. Measurement before claims
-
-I evaluate changes with **TTFT, TPOT/ITL, throughput, acceptance rate, memory
-usage, profiler traces, and recovery time**. Benchmark inputs, configurations,
-raw results, and limitations are kept together so another engineer can inspect
-the conclusion.
-
-### 3. Engineering under real constraints
-
-I work with constraints such as a **12 GB consumer GPU, CPU-only ARM64,
-Windows/WSL2, and single-node K3s**. I make the trade-offs explicit and design
-for the environment that exists rather than assuming unlimited hardware.
-
-### 4. From investigation to upstream contribution
-
-I turn observations into minimal reproductions, design proposals, tests,
-benchmarks, and reviewable changes. The merged llama.cpp contribution shows
-that I can respond to maintainer feedback and carry a systems change through
-upstream review.
-
-## What I work on
-
-- LLM inference with **vLLM, llama.cpp, Ollama, and SGLang**
-- **KV Cache, Prefix Cache, speculative decoding, and quantization**
-- **CUDA C++ and Triton** kernel implementation and profiling
-- **Kubernetes, K3s, Helm, gateways, observability, and failure recovery**
-- Reproducible evaluation of **TTFT, TPOT/ITL, throughput, memory, and cache
-  behavior**
-- **ARM64 and edge AI** under real hardware and operating-system constraints
-
-## Selected projects
-
-| Project | Engineering focus | Evidence |
+| 成果 | 実装・検証したこと | 証拠 |
 | --- | --- | --- |
-| [CUDA Kernel Engineering for LLM Decode](https://github.com/CHIPMUNK-T0T/cuda-kernel-engineering) | PyTorch/Triton/CUDA C++, Nsight profiling, mini-decode to real vLLM | ~15% lower TPOT under documented conditions |
-| [Edge LLM Platform on ARM64](https://github.com/CHIPMUNK-T0T/edge-llm-cpu-arm64) | K3s, Helm, Envoy, Tailscale, Prometheus/Grafana, recovery | Deployment contracts and measured recovery evidence |
-| [Ollama Prefill KV Restore](https://github.com/ai-systems-notes/ollama-prefill-kv-restore) | Persistent prefix-cache reuse and TTFT measurement | Reproducible benchmark and upstream design work |
-| [Local LLM RAG vs CAG Benchmark](https://github.com/ai-systems-notes/local-llm-rag-cag-benchmark) | Accuracy, TTFT, and token-cost comparison | Same-model, same-hardware evaluation |
+| **llama.cppへ実装をマージ** | マルチモーダル入力を含むslot save/restoreを実装。レビュー対応、テスト、ベンチマークまで完遂 | [ggml-org/llama.cpp #26640](https://github.com/ggml-org/llama.cpp/pull/26640) — 限定条件下でprompt processing **13.4×高速化** |
+| **実vLLMのdecodeを改善** | Nsightでrequest windowを分解し、Qwen3.5のRMSNorm pathをCUDA/Tritonで最適化 | [CUDA Kernel Engineering](https://github.com/CHIPMUNK-T0T/cuda-kernel-engineering) — decode TPOT **約15%短縮**、94→112 tokens/s |
+| **ARM64上に運用可能なLLM基盤を構築** | Windows on ARM / WSL2 / K3sで、Helm、Gateway、監視、private access、upgrade/rollback、復旧試験を実装 | [Edge LLM Platform](https://github.com/CHIPMUNK-T0T/edge-llm-cpu-arm64) — WSL復旧時のK3s API **10.5秒**、外部health **253.9秒** |
 
-## Open-source work
+数値は記載したハードウェア・モデル・設定での結果です。一般化せず、入力、設定、
+raw result、失敗条件、限界をリポジトリに残しています。
 
-I contribute findings and implementations upstream instead of keeping every
-result in a standalone demo.
+## 私の強み
 
-- [llama.cpp #26640 — multimodal slot save/restore](https://github.com/ggml-org/llama.cpp/pull/26640)
-  — merged
-- [llama.cpp #27942 — byte-oriented per-sequence payload design](https://github.com/ggml-org/llama.cpp/issues/27942)
-- [Ollama #17247 — warm prefill cache across model unload/reload](https://github.com/ollama/ollama/issues/17247)
+### 1. 性能問題を、層をまたいで追える
 
-## Technical writing
+GPUカーネルだけ、APIだけを見るのではなく、
+**kernel → runtime → serving → infrastructure** のどこがend-to-end latencyを
+支配しているかを切り分けます。局所ベンチで速くても実backendで効かなければ、
+その理由までprofileで説明します。
 
-I publish Japanese implementation notes and benchmark results on
-[Qiita (@Marron-chan)](https://qiita.com/Marron-chan).
+### 2. 「速くなった」を再検証できる形にする
 
-## Role interests
+TTFT、TPOT/ITL、throughput、acceptance rate、memory、profiler trace、recovery timeを
+目的に応じて使い分けます。成功例だけでなく、効かなかった条件やハードウェア制約も
+残し、第三者が判断できる証拠にします。
 
-I am interested in **LLM Inference Engineer, ML Systems Engineer, AI
-Infrastructure Engineer, GPU Performance Engineer, and Forward Deployed
-Engineer** roles where measured systems work matters.
+### 3. 制約のある環境で、成立条件を見つける
+
+RTX 4070 12 GB、CPU-only ARM64、Windows/WSL2、single-node K3sのような
+現実の制約を隠しません。制約を前提に、再現可能な構成、運用手順、観測方法、
+復旧方法まで設計します。
+
+### 4. 調査をOSSで使われる変更まで進める
+
+再現 → 原因分析 → design proposal → 実装 → test/benchmark → maintainer review
+までつなげます。llama.cppへのmerged contributionは、手元の実験で終わらず、
+既存プロジェクトの設計と品質基準に合わせて変更を届けた実績です。
+
+## 任せられる領域
+
+- 原因が不明なLLM推論のlatency / throughput低下の調査
+- CUDA C++ / Tritonによるkernel実装と、実runtimeでの効果検証
+- vLLM / llama.cpp / Ollama / SGLang周辺の推論・cache・量子化評価
+- Kubernetes / K3s / Helmによるprivate serving基盤とobservability
+- 顧客・edge・on-premises環境を想定した技術検証、切り分け、再現手順の作成
+- upstream issue、設計提案、patch、review対応
 
 ---
 
-## 日本語
+## English summary
 
-LLM推論を中心に、性能計測、推論ランタイム、CUDA/Tritonカーネル最適化、
-KubernetesによるServing Infrastructure、Observability、障害復旧、
-ARM64 Edge Deploymentまで横断して取り組んでいます。
+I specialize in the systems work behind LLM applications: **inference
+performance, GPU kernels, runtimes, serving infrastructure, observability, and
+recovery**.
 
-単にモデルを動かすのではなく、ボトルネックを実測し、改善を実装し、
-end-to-endで効果を検証し、成立条件と限界まで再現可能な形で残すことを
-重視しています。
+My strength is connecting layers. I can start from an end-to-end latency or
+throughput problem, locate the controlling bottleneck with benchmarks and
+profilers, implement a focused change, and verify whether it still matters in a
+real backend. I document both the result and the conditions where it does not
+generalize.
 
-主な成果は、llama.cppへのマルチモーダルslot save/restore実装のマージ、
-限定条件下での実vLLM decode TPOT約15%短縮、Windows ARM64・WSL2・K3s上の
-CPU-only LLM serving基盤と復旧実測です。
+### Selected evidence
+
+- **Upstream delivery:** merged multimodal slot save/restore into
+  [llama.cpp #26640](https://github.com/ggml-org/llama.cpp/pull/26640), including
+  design discussion, tests, and benchmark evidence.
+- **GPU-to-runtime optimization:** traced a real vLLM decode request with Nsight,
+  implemented CUDA/Triton kernels, and measured **~15% lower TPOT** under the
+  documented workload.
+- **Constrained infrastructure:** built and recovery-tested a private CPU-only
+  ARM64 LLM serving platform using Windows on ARM, WSL2, K3s, Helm, Envoy,
+  Prometheus, Grafana, and Tailscale.
+
+This work is relevant to **LLM Inference, ML Systems, GPU Performance, AI
+Infrastructure, and Forward Deployed Engineering** roles.
+
+## Core technologies
+
+**Inference:** vLLM, llama.cpp, Ollama, SGLang, KV/prefix cache, speculative decoding, quantization  
+**Performance:** CUDA C++, Triton, PyTorch extensions, Nsight Systems/Compute, TTFT, TPOT/ITL  
+**Infrastructure:** Kubernetes, K3s, Helm, Envoy Gateway, Prometheus, Grafana, Tailscale  
+**Platforms:** NVIDIA consumer GPUs, Windows on ARM, WSL2 Ubuntu ARM64, CPU-only edge
+
+## Open-source work
+
+- [llama.cpp #26640 — multimodal slot save/restore](https://github.com/ggml-org/llama.cpp/pull/26640) — **merged**
+- [llama.cpp #27942 — byte-oriented per-sequence payload design](https://github.com/ggml-org/llama.cpp/issues/27942)
+- [Ollama #17247 — warm prefill cache across model unload/reload](https://github.com/ollama/ollama/issues/17247)
+
+## 技術記事 / Technical writing
+
+日本語の実装記録とベンチマークを
+[Qiita (@Marron-chan)](https://qiita.com/Marron-chan)で公開しています。
